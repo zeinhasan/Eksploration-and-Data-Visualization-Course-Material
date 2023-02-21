@@ -1,0 +1,231 @@
+#menyiapkan data
+help("state.x77")
+data=state.x77
+data=as.data.frame(data)
+
+#membuat boxplot
+boxplot(data$Murder, xlab="Murder Rate", ylab="Rate",
+        main="Boxplot Murder Rate",col="skyblue",border = "blue")
+
+boxplot(data$Murder)
+
+#ggplot2
+library(ggplot2)
+ggplot(data, aes(y=Murder))+
+  geom_boxplot(fill="green",color="blue")+
+  ggtitle("Boxplot of Murder")+
+  xlab("Murder")+
+  ylab("Value")
+
+ggplot(data, aes(y=Murder))+
+  geom_boxplot()
+
+#plotly
+install.packages("plotly")
+library(plotly)
+murder=ggplot(data, aes(y=Murder))+
+  geom_boxplot(fill="green",color="yellow")+
+  ggtitle("Boxplot of Murder")+
+  xlab("Murder")+
+  ylab("Value")
+ggplotly(murder)
+
+#boxplot dengan menggabungkan data
+library(tidyverse)
+data1=select(data,Population,Area)
+data2=data1 %>% gather(key=variabel,
+                       value=Value)
+
+boxplot(data2$Value, xlab="Murder Rate", ylab="Rate",
+        main="Boxplot Murder Rate",col="skyblue",border = "blue")
+
+#boxplot lebih dari 1 angkatan
+#standar
+boxplot(data[1:3],xlab="Variable", col=c("yellow","blue","gold"))
+legend("topright",legend =c("popullation","Income","lliteracy"),
+       fill=c("yellow","blue","gold"),cex=1,title = "legend")
+
+#ggplot2
+install.packages("gapminder")
+library(gapminder)
+mydat=gapminder
+ggplot(mydat,aes(continent,lifeExp,color=continent))+
+  geom_boxplot(fill="gold",outlier.color = "green",
+               outlier.size=2,outlier.shape=17)
+
+#plotly
+yeayy=ggplot(mydat,aes(continent,lifeExp,color=continent))+
+  geom_boxplot(fill="gold",outlier.color = "green",
+               outlier.size=2,outlier.shape=17)
+ggplotly(yeayy)
+
+
+
+
+# Read data
+library(readxl)
+dataku <- read_excel("D:\\Kuliah\\Praktikum Eksplorasi dan Visualisasi Data\\Pertemuan 3\\Pertemuan 4.xlsx")
+
+# Check Data
+head(dataku)
+
+boxplot(dataku,xlab="Variable",ylab="Count",
+        main="BoxplotDaily Spending VS Entertainment Spending",
+        col = c("red","blue"))
+
+legend(legend=c("Daily Spending","Entertainment Spending"),
+       col = c("red","blue"),'topright',
+       cex=0.8,fill=c("red","blue"),title="Legenda")
+
+
+# Summary 
+summary(dataku)
+IQR(dataku$`Daily Spending`)
+IQR(dataku$`Entertainment Spending`)
+
+
+# Standarisasi 
+standarisasi <- function(data,pusat,sebaran){
+  z=(data-pusat)/sebaran
+  return(z)
+}
+
+# Standarisasi Daily Spending
+std_Dailyspd <- standarisasi(dataku$`Daily Spending`,
+                             median(dataku$`Daily Spending`),
+                             IQR(dataku$`Daily Spending`))
+head(std_Dailyspd)
+
+# Standarisasi Entertaiment Spending
+std_Entairspd <- standarisasi(dataku$`Entertainment Spending`,
+                             median(dataku$`Entertainment Spending`),
+                             IQR(dataku$`Entertainment Spending`))
+head(std_Entairspd)
+
+# Mengunakan Packages
+######## Warning Tidak Semua Pusat dan Sebaran Digunakan ###########
+library(robustHD)
+std_data <- standardize(dataku, centerFun = median, scaleFun = IQR)
+
+head(std_data)
+
+
+# Boxplot Hasil Standarisasi 
+data_terstd <- data.frame(std_Dailyspd,std_Entairspd)
+
+boxplot(data_terstd,xlab="Variable",ylab="Count",
+        main="Boxplot Daily Spending VS Entertainment Spending (Standardized)",
+        col = c("red","blue"))
+
+legend(legend=c("Daily Spending","Entertainment Spending"),
+       col = c("red","blue"),'topright',
+       cex=0.8,fill=c("red","blue"),title="Legenda")
+
+
+
+# Latihan
+mydata <- read.delim("clipboard")
+
+head(mydata)
+
+
+# Plot data cara 1
+boxplot(mydata[2:5],xlab="Variable",ylab="Count",
+        main="Boxplot  tingkat kematian laki-laki karena penyakit jantung",
+        col = c("red","blue","green","yellow"))
+
+legend(legend=c("Usia.20.29.tahun","Usia.30.39.tahun","Usia.40.49.tahun","Usia.50.59.tahun"),
+       col = c("red","blue","green","yellow"),'topleft',
+       cex=0.8,fill=c("red","blue","green","yellow"),title="Legenda")
+
+
+# Plot data cara 2
+install.packages("reshape")
+install.packages("ggplot2")
+library(reshape)
+library(ggplot2)
+
+data_long <- melt(mydata)
+head(data_long)
+
+ggplot(data_long, aes(x=variable,y=value,fill=variable))+
+  geom_boxplot()+
+  ggtitle("Boxplot tingkat kematian laki-laki karena penyakit jantung")+
+  xlab("variabel")+
+  ylab("Jumlah")
+
+ggplot(data_long, aes(x=variable,y=value,color=variable))+
+  geom_boxplot()+
+  ggtitle("Boxplot  tingkat kematian laki-laki karena penyakit jantung")+
+  xlab("variabel")+
+  ylab("Jumlah")
+
+ggplot(data_long, aes(x=variable,y=value))+
+  geom_boxplot(color="black",fill="blue")+
+  ggtitle("Boxplot  tingkat kematian laki-laki karena penyakit jantung")+
+  xlab("variabel")+
+  ylab("Jumlah")
+
+
+# Checking Outlier with Boxplot  
+library(tidyverse)
+is_outlier <- function(x) {
+  return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x))
+}
+
+data_long %>%
+  group_by(variable) %>%
+  mutate(outlier = ifelse(is_outlier(value), value, as.numeric(NA))) %>%
+  ggplot(., aes(x = variable, y = value,fill=variable)) +
+  geom_boxplot() +
+  geom_text(aes(label = c(outlier)), na.rm = TRUE, hjust = -0.3)+
+  ggtitle("Boxplot  tingkat kematian laki-laki karena penyakit jantung")+
+  xlab("variabel")+
+  ylab("Jumlah")
+
+
+# Interactive Boxplot
+library(plotly)
+
+x <- data_long %>%
+     group_by(variable) %>%
+     mutate(outlier = ifelse(is_outlier(value), value, as.numeric(NA))) %>%
+     ggplot(., aes(x = variable, y = value,fill=variable)) +
+     geom_boxplot() +
+     geom_text(aes(label = c(outlier)), na.rm = FALSE, hjust = -0.3)+
+     ggtitle("Boxplot")+
+     xlab("variabel")+
+     ylab("Jumlah")
+
+ggplotly(x)
+
+
+
+#####################       Standarisasi        #######################
+library(robustHD)
+std_data <- standardize(mydata[2:5], centerFun = median, scaleFun = IQR)
+
+head(std_data)
+
+boxplot(std_data,xlab="Variable",ylab="Count",
+        main="Boxplot  tingkat kematian laki-laki karena penyakit jantung (Standardized)",
+        col = c("red","blue","green","yellow"))
+
+legend(legend=c("Usia.20.29.tahun","Usia.30.39.tahun","Usia.40.49.tahun","Usia.50.59.tahun"),
+       col = c("red","blue","green","yellow"),'topleft',
+       cex=0.8,fill=c("red","blue","green","yellow"),title="Legenda")
+
+std_data_long <- melt(std_data)
+head(std_data_long)
+
+# Checking Outlier with Boxplot  
+std_data_long %>%
+  group_by(variable) %>%
+  mutate(outlier = ifelse(is_outlier(value), value, as.numeric(NA))) %>%
+  ggplot(., aes(x = variable, y = value,fill=variable)) +
+  geom_boxplot() +
+  geom_text(aes(label = c(outlier)), na.rm = TRUE, hjust = -0.3)+
+  ggtitle("Boxplot  tingkat kematian laki-laki karena penyakit jantung (Standardized)")+
+  xlab("variabel")+
+  ylab("Jumlah")
+
