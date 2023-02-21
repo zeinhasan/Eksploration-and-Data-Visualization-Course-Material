@@ -2,8 +2,8 @@
 
 ## About This Repository:
 - Author & Instructor : Ahmad Habib Hasan Zein, Mesy Diah Ariani
-- Start Date          : 23 August 2022
-- End Date            : 28 December 2022
+- Start Date          : 18 February 2022
+- End Date            : 28 July 2022
 
 ## List of Content:
 - Week 1 - Introduction to R
